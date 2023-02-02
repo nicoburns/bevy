@@ -55,7 +55,6 @@ pub fn from_val(scale_factor: f64, val: Val) -> taffy::style::Dimension {
         Val::Auto => taffy::style::Dimension::Auto,
         Val::Percent(value) => taffy::style::Dimension::Percent(value / 100.0),
         Val::Px(value) => taffy::style::Dimension::Points((scale_factor * value as f64) as f32),
-        Val::Undefined => taffy::style::Dimension::Undefined,
     }
 }
 

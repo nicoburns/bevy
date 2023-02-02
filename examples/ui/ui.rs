@@ -121,7 +121,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                         style: Style {
                                             flex_direction: FlexDirection::Column,
                                             flex_grow: 1.0,
-                                            max_size: Size::UNDEFINED,
                                             align_items: AlignItems::Center,
                                             ..default()
                                         },
@@ -144,7 +143,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                             )
                                             .with_style(Style {
                                                 flex_shrink: 0.,
-                                                size: Size::new(Val::Undefined, Val::Px(20.)),
+                                                size: Size::height(Val::Px(20.)),
                                                 ..default()
                                             }),
                                         );
@@ -160,7 +159,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                         position: UiRect {
                             left: Val::Px(210.0),
                             bottom: Val::Px(10.0),
-                            ..default()
+                            top: Val::Auto,
+                            right: Val::Auto,
                         },
                         border: UiRect::all(Val::Px(20.0)),
                         ..default()
@@ -209,7 +209,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                     position: UiRect {
                                         left: Val::Px(20.0),
                                         bottom: Val::Px(20.0),
-                                        ..default()
+                                        top: Val::Auto,
+                                        right: Val::Auto,
                                     },
                                     ..default()
                                 },
@@ -223,7 +224,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                     position: UiRect {
                                         left: Val::Px(40.0),
                                         bottom: Val::Px(40.0),
-                                        ..default()
+                                        top: Val::Auto,
+                                        right: Val::Auto,
                                     },
                                     ..default()
                                 },
@@ -237,7 +239,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                     position: UiRect {
                                         left: Val::Px(60.0),
                                         bottom: Val::Px(60.0),
-                                        ..default()
+                                        top: Val::Auto,
+                                        right: Val::Auto,
                                     },
                                     ..default()
                                 },
@@ -252,7 +255,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                     position: UiRect {
                                         left: Val::Px(80.0),
                                         bottom: Val::Px(80.0),
-                                        ..default()
+                                        top: Val::Auto,
+                                        right: Val::Auto,
                                     },
                                     ..default()
                                 },
