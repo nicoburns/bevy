@@ -43,19 +43,21 @@ fn infotext_system(mut commands: Commands, asset_server: Res<AssetServer>) {
         }),
     );
     commands.spawn(TextBundle::from_section(
-            "This text is very long, has a limited width, is centred, is positioned in the top right and is also coloured pink.",
+            "This text is very long, has a percentage width that is proportional to the width of the window \
+               and an automatic height which depends on text layout. It is centred, is positioned in the top right and is also coloured pink.",
             TextStyle {
                 font: font.clone(),
-                font_size: 50.0,
+                font_size: 36.0,
                 color: Color::rgb(0.8, 0.2, 0.7),
             },
         )
+        .with_background_color(Color::WHITE)
         .with_text_alignment(TextAlignment::Center)
         .with_style(Style {
             position_type: PositionType::Absolute,
             top: Val::Px(5.0),
             right: Val::Px(15.0),
-            max_size: Size::width(Val::Px(400.)),
+            size: Size::width(Val::Percent(100.0 / 3.0)),
             ..default()
         })
     );
