@@ -9,7 +9,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                resolution: [870., 1066.].into(),
+                resolution: [1000., 700.].into(),
                 title: "Bevy Flex Layout Example".to_string(),
                 ..Default::default()
             }),
@@ -27,7 +27,6 @@ fn spawn_layout(mut commands: Commands, asset_server: Res<AssetServer>) {
             style: Style {
                 // fill the entire window
                 size: Size::all(Val::Percent(100.)),
-                flex_direction: FlexDirection::Column,
                 align_items: AlignItems::Center,
                 ..Default::default()
             },
@@ -35,38 +34,13 @@ fn spawn_layout(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..Default::default()
         })
         .with_children(|builder| {
-            // spawn the key
-            builder
-                .spawn(NodeBundle {
-                    style: Style {
-                        flex_direction: FlexDirection::Row,
-                        margin: UiRect::top(MARGIN),
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                })
-                .with_children(|builder| {
-                    spawn_nested_text_bundle(
-                        builder,
-                        font.clone(),
-                        ALIGN_ITEMS_COLOR,
-                        UiRect::right(MARGIN),
-                        "AlignItems",
-                    );
-                    spawn_nested_text_bundle(
-                        builder,
-                        font.clone(),
-                        JUSTIFY_CONTENT_COLOR,
-                        UiRect::default(),
-                        "JustifyContent",
-                    );
-                });
 
             builder
                 .spawn(NodeBundle {
                     style: Style {
-                        min_size: Size::new(Val::Px(850.), Val::Px(1020.)),
-                        flex_direction: FlexDirection::Column,
+                        display: Display::Grid,
+                        size: Size::all(Val::Percent(100.0)),
+                        grid_template_columns: RepeatedGridTrack::fr(5, 1.0),
                         ..Default::default()
                     },
                     ..Default::default()
@@ -74,57 +48,84 @@ fn spawn_layout(mut commands: Commands, asset_server: Res<AssetServer>) {
                 .with_children(|builder| {
                     // spawn one child node for each combination of `AlignItems` and `JustifyContent`
                     let justifications = [
-                        JustifyContent::FlexStart,
-                        JustifyContent::Center,
-                        JustifyContent::FlexEnd,
-                        JustifyContent::SpaceEvenly,
-                        JustifyContent::SpaceAround,
-                        JustifyContent::SpaceBetween,
+                        (JustifyContent::Start, JustifyItems::Start),
+                        (JustifyContent::Center, JustifyItems::Center),
+                        (JustifyContent::End, JustifyItems::End),
+                        (JustifyContent::SpaceEvenly, JustifyItems::Start),
+                        (JustifyContent::SpaceAround, JustifyItems::Start),
+                        (JustifyContent::SpaceBetween, JustifyItems::Start),
                     ];
                     let alignments = [
                         AlignItems::Baseline,
-                        AlignItems::FlexStart,
+                        AlignItems::Start,
                         AlignItems::Center,
-                        AlignItems::FlexEnd,
+                        AlignItems::End,
                         AlignItems::Stretch,
                     ];
                     for justify_content in justifications {
-                        builder
-                            .spawn(NodeBundle {
-                                style: Style {
-                                    flex_direction: FlexDirection::Row,
-                                    ..Default::default()
-                                },
-                                ..Default::default()
-                            })
-                            .with_children(|builder| {
-                                for align_items in alignments {
-                                    spawn_child_node(
-                                        builder,
-                                        font.clone(),
-                                        align_items,
-                                        justify_content,
-                                    );
-                                }
-                            });
+                        for align_items in alignments {
+                            spawn_demo_cell(
+                                builder,
+                                font.clone(),
+                                Display::Flex,
+                                FlexDirection::Column,
+                                align_items,
+                                justify_content,
+                            );
+                        }
                     }
+                });
+
+            // Sidebar
+            builder
+                .spawn(NodeBundle {
+                    style: Style {
+                        flex_direction: FlexDirection::Column,
+                        margin: UiRect::top(MARGIN),
+                        padding: UiRect::all(Val::Px(10.)),
+                        size: Size::width(Val::Px(300.)),
+                        // justify_content: JustifyContent::Start,
+                        align_items: AlignItems::Stretch,
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                })
+                .with_children(|builder| {
+                    spawn_label(
+                        builder,
+                        font.clone(),
+                        ALIGN_ITEMS_COLOR,
+                        UiRect::bottom(MARGIN),
+                        "AlignItems",
+                    );
+                    spawn_label(
+                        builder,
+                        font.clone(),
+                        JUSTIFY_CONTENT_COLOR,
+                        UiRect::default(),
+                        "JustifyContent",
+                    );
                 });
         });
 }
 
-fn spawn_child_node(
+fn spawn_demo_cell(
     builder: &mut ChildBuilder,
     font: Handle<Font>,
+    display: Display,
+    flex_direction: FlexDirection,
     align_items: AlignItems,
-    justify_content: JustifyContent,
+    (justify_content, justify_items): (JustifyContent, JustifyItems),
 ) {
     builder
         .spawn(NodeBundle {
             style: Style {
-                flex_direction: FlexDirection::Column,
+                display,
+                flex_direction,
                 align_items,
                 justify_content,
-                size: Size::all(Val::Px(160.)),
+                justify_items,
+                // size: Size::all(Val::Px(100.)),
                 margin: UiRect::all(MARGIN),
                 ..Default::default()
             },
@@ -134,11 +135,14 @@ fn spawn_child_node(
         .with_children(|builder| {
             let labels = [
                 (format!("{align_items:?}"), ALIGN_ITEMS_COLOR, 0.),
-                (format!("{justify_content:?}"), JUSTIFY_CONTENT_COLOR, 3.),
+                match display {
+                    Display::Flex => (format!("{justify_content:?}"), JUSTIFY_CONTENT_COLOR, 3.),
+                    Display::Grid => (format!("{justify_items:?}"), JUSTIFY_CONTENT_COLOR, 3.),
+                    Display::None => unreachable!(),
+                }
             ];
             for (text, color, top_margin) in labels {
-                // We nest the text within a parent node because margins and padding can't be directly applied to text nodes currently.
-                spawn_nested_text_bundle(
+                spawn_label(
                     builder,
                     font.clone(),
                     color,
@@ -149,13 +153,14 @@ fn spawn_child_node(
         });
 }
 
-fn spawn_nested_text_bundle(
+fn spawn_label(
     builder: &mut ChildBuilder,
     font: Handle<Font>,
     background_color: Color,
     margin: UiRect,
     text: &str,
 ) {
+    // We nest the text within a parent node because margins and padding can't be directly applied to text nodes currently.
     builder
         .spawn(NodeBundle {
             style: Style {
@@ -166,6 +171,8 @@ fn spawn_nested_text_bundle(
                     right: Val::Px(5.),
                     bottom: Val::Px(1.),
                 },
+                grid_row: GridPlacement::start(1),
+                grid_column: GridPlacement::start(1),
                 ..Default::default()
             },
             background_color: BackgroundColor(background_color),
@@ -176,7 +183,7 @@ fn spawn_nested_text_bundle(
                 text,
                 TextStyle {
                     font,
-                    font_size: 24.0,
+                    font_size: 16.0,
                     color: Color::BLACK,
                 },
             ));
