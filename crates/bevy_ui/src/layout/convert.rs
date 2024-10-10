@@ -70,6 +70,9 @@ pub fn from_style(
 ) -> taffy::style::Style {
     taffy::style::Style {
         display: style.display.into(),
+        box_sizing: taffy::BoxSizing::BorderBox,
+        item_is_table: false,
+        text_align: taffy::TextAlign::Auto,
         overflow: taffy::Point {
             x: style.overflow.x.into(),
             y: style.overflow.y.into(),
